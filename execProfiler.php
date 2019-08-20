@@ -177,9 +177,10 @@ class execProfiler {
                     json_encode(
                         self::$execTiming,
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                    )
+                    ).
+                    "\n"
                 );
-                unset(self::$execTiming);
+                self::$execTiming = NULL;
             }
         }
     }
