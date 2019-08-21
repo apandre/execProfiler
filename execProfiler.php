@@ -8,29 +8,27 @@
  *          for executions and variable watching of your choosing.
  *          Its accumulate all information in one array,
  *          and then you can output all of it into many different ways.
+ * @package execProfiler
  */
 
 ini_set('display_errors', 1);
 
 /**
+ * @property array $execTiming Property represent a container that accumulate all profiling information
+ *                             and variable watching by storing it based on execution marker as a key.
  *
+ * @method string startTimer(string $marker) Method start execution timing for specified marker
  *
  */
 class execProfiler {
     /**
-     * Property represent a container that accumulate all profiling information
-     * and variable watching by storing it based on execution marker as a key.
      *
-     * @static array
+     * @static
      */
     public static $execTiming = array();
 
     /**
-     * Contain identification of order by which accumulated content of self::$execTiming will be output.
-     * Elements for each execution marker created by start time.
-     * That is why it is default order.
-     * If order property is set to 1, then elements of self::$execTiming must be output
-     * by $element['    stop time'] value.
+     *
      *
      * @static
      * @var int 0 - output order is by start time (default)
@@ -39,9 +37,11 @@ class execProfiler {
     public static $sortOutputBy = 0;
 
     /**
-     * Method start execution timing for specified marker
+     * @uses element Description
      *
      * @param string $marker
+     * @return string Constructed execution marker, that made up from execution start time
+     *                and provided parameter.
      */
     public static function startTimer( $marker ) {
         $backtrace = debug_backtrace();
@@ -52,7 +52,7 @@ class execProfiler {
         if (empty($marker)) {
             $execMarker = $date_time_ms;   //self::getExecMarkerAsFileAndLineNum();
         } else {
-            $execMarker = $date_time_ms.' -- '.$marker;
+            $execMarker = $marker;
         }
         self::$execTiming[$execMarker]['   start time'] = $date_time_ms;
         self::$execTiming[$execMarker]['exec start in'] = $execStartMarker;
@@ -103,8 +103,8 @@ class execProfiler {
      *                          That is why it is default order.
      *                          If order property is set to 1, then elements of self::$execTiming
      *                          must be output by $element['    stop time'] value.
-     *            0 - output order is by start time (default)
-     *            1 - output order is by stop time
+     *        0 - output order is by start time (default)
+     *        1 - output order is by stop time
      *
      * @param type $output
      * @param type $fullFilePath
