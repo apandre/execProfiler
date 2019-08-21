@@ -95,8 +95,11 @@ class execProfiler {
     /**
      * Method output information accumulated within self::$execTiming container
      *
-     * @uses usage Following code example should be used to output profiling and watched variables data:
+     * @uses usage  Following code example should be used to output profiling and watched variables data:
      *                  execProfiler::outputExecStat(1);
+     *              Usually, it is last peace of code within test script,
+     *              unless developer wish to start another profiling accumulation session.
+     *              Accumulation container will be emptied
      *
      * @param int $sortOutputBy Contain identification of order by which accumulated content
      *                          of self::$execTiming will be output.
@@ -181,10 +184,10 @@ class execProfiler {
                     ).
                     "\n"
                 );
-                self::$execTiming = array();
                 break;
             }
         }
+        self::$execTiming = array();
     }
 
     /**
