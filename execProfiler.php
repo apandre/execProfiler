@@ -14,30 +14,21 @@
 ini_set('display_errors', 1);
 
 /**
- * @property array $execTiming Property represent a container that accumulate all profiling information
- *                             and variable watching by storing it based on execution marker as a key.
- *
- * @method string startTimer(string $marker) Method start execution timing for specified marker
  *
  */
 class execProfiler {
     /**
-     *
+     * @var array $execTiming Property represent a container that accumulate all profiling information
+     * and variable watching by storing it based on execution marker as a key.
      * @static
      */
     public static $execTiming = array();
 
     /**
+     * Method start execution timing for specified marker
      *
-     *
-     * @static
-     * @var int 0 - output order is by start time (default)
-     *          1 - output order is by stop time
-     */
-    public static $sortOutputBy = 0;
-
-    /**
-     * @uses element Description
+     * @uses usage Following code example should be used to start profiling:
+     *              $execMarker = execProfiler::startTimer("My Execution Marker");
      *
      * @param string $marker
      * @return string Constructed execution marker, that made up from execution start time
