@@ -23,7 +23,7 @@ class execProfiler {
      *
      * @static array
      */
-    public static $execTiming;
+    public static $execTiming = array();
 
     /**
      * Contain identification of order by which accumulated content of self::$execTiming will be output.
@@ -50,9 +50,9 @@ class execProfiler {
         $date = DateTime::createFromFormat('U.u', $microtime);
         $date_time_ms = $date->format('Y-m-d H:i:s.u');
         if (empty($marker)) {
-            $execMarker = self::execMarker();
+            $execMarker = $date_time_ms;   //self::getExecMarkerAsFileAndLineNum();
         } else {
-            $execMarker = $marker;
+            $execMarker = $date_time_ms.' -- '.$marker;
         }
         self::$execTiming[$execMarker]['   start time'] = $date_time_ms;
         self::$execTiming[$execMarker]['exec start in'] = $execStartMarker;
@@ -180,7 +180,7 @@ class execProfiler {
                     ).
                     "\n"
                 );
-                self::$execTiming = NULL;
+                self::$execTiming = array();
             }
         }
     }
@@ -190,7 +190,7 @@ class execProfiler {
      *
      * @return string
      */
-    public static function execMarker() {
+    public static function getExecMarkerAsFileAndLineNum() {
         $backtrace = debug_backtrace();
         $execMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
         return $execMarker;
