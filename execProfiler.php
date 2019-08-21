@@ -113,7 +113,12 @@ class execProfiler {
      * @param type $output
      * @param type $fullFilePath
      */
-    public static function outputExecStat( $sortOutputBy = 0, $output = 'print', $fullFilePath = FALSE ) {
+    public static function outputExecStat(
+        $sortOutputBy = 0,
+        $outputLabel = '',
+        $output = 'print',
+        $fullFilePath = FALSE
+    ) {
         switch ($output)
         {
             // variable watching included
@@ -177,12 +182,12 @@ class execProfiler {
                     ksort(self::$execTiming);
                 }
                 print(
-                    "\n".
+                    "\n####### Bigining of execProfiler output:\n\n".
                     json_encode(
                         self::$execTiming,
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                    ).
-                    "\n"
+                    )."\n".
+                    "\n####### Ending of execProfiler output.\n"
                 );
                 break;
             }
