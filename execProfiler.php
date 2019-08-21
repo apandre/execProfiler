@@ -28,7 +28,7 @@ class execProfiler {
      * Method start execution timing for specified marker
      *
      * @uses usage Following code example should be used to start profiling:
-     *              $execMarker = execProfiler::startTimer("My Execution Marker");
+     *                  $execMarker = execProfiler::startTimer("My Execution Marker");
      *
      * @param string $marker
      * @return string Constructed execution marker, that made up from execution start time
@@ -54,6 +54,9 @@ class execProfiler {
     /**
      * Method stop execution timing for specified marker
      *
+     * @uses usage Following code example should be used to stop profiling:
+     *                  execProfiler::stopTimer($execMarker);
+     *
      * @param string $startMarker
      */
     public static function stopTimer( $startMarker ) {
@@ -76,6 +79,10 @@ class execProfiler {
     /**
      * Method add variable/object for watching to appropriate place in accumulated container.
      *
+     * @uses usage Following code example should be used to add variable
+     *             to variables watching list for specific execution marker:
+     *                  execProfiler::addVarToWatch($execMarker, 'var_name', $var);
+     *
      * @param string $mark
      * @param string $varname
      * @param any-type $var
@@ -87,6 +94,9 @@ class execProfiler {
 
     /**
      * Method output information accumulated within self::$execTiming container
+     *
+     * @uses usage Following code example should be used to output profiling and watched variables data:
+     *                  execProfiler::outputExecStat(1);
      *
      * @param int $sortOutputBy Contain identification of order by which accumulated content
      *                          of self::$execTiming will be output.
@@ -172,6 +182,7 @@ class execProfiler {
                     "\n"
                 );
                 self::$execTiming = array();
+                break;
             }
         }
     }
