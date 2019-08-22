@@ -4,9 +4,9 @@
  * @copyright (c) 2009-current, Alex Pandre
  * @license MIT
  * @version 1.00s
- * @link git@github.com:apandre/execProfiler.git Code Profiler and variables watch
- *          for executions and variable watching of your choosing.
- *          Its accumulate all information in one array,
+ * @link https://github.com/apandre/execProfiler PHP Code Execution Profiler and variable watcher.
+ * @uses    For executions and variable watching of your choosing.
+ *          Its accumulate all information in property array,
  *          and then you can output all of it into many different ways.
  * @package execProfiler
  */
@@ -31,10 +31,13 @@ class execProfiler {
      *                  $execMarker = execProfiler::startTimer("My Execution Marker");
      *
      * @param string $marker
+     * @param int $bkTrace  If equal 1, then result of debug_backtrace() will be included
+     *                      the same way as watched variable.
+     *
      * @return string Constructed execution marker, that made up from execution start time
      *                and provided parameter.
      */
-    public static function startTimer( $marker ) {
+    public static function startTimer( $marker, $bkTrace = 0 ) {
         $backtrace = debug_backtrace();
         $execStartMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
         $microtime = microtime(TRUE);
@@ -48,6 +51,9 @@ class execProfiler {
         self::$execTiming[$execMarker]['   start time'] = $date_time_ms;
         self::$execTiming[$execMarker]['exec start in'] = $execStartMarker;
         self::$execTiming[$execMarker]['exec_started'] = $microtime;
+        if ( $bkTrace == 1 ) {
+            self::$execTiming[$execMarker]['backtrace'] = $backtrace;
+        }
         return $execMarker;
     }
 
