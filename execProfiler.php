@@ -41,7 +41,7 @@ class execProfiler {
         $backtrace = debug_backtrace();
         $execStartMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
         $microtime = microtime(TRUE);
-        $date = DateTime::createFromFormat('U.u', $microtime);
+        $date = DateTime::createFromFormat('U.u', (string) $microtime);
         $date_time_ms = $date->format('Y-m-d H:i:s.u');
         if (empty($marker)) {
             $execMarker = $date_time_ms;   //self::getExecMarkerAsFileAndLineNum();
@@ -69,7 +69,7 @@ class execProfiler {
         $backtrace = debug_backtrace();
         $execEndMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
         $microtime = microtime(TRUE);
-        $date = DateTime::createFromFormat('U.u', $microtime);
+        $date = DateTime::createFromFormat('U.u', (string) $microtime);
         $date_time_ms = $date->format('Y-m-d H:i:s.u');
         self::$execTiming[$startMarker]['    stop time'] = $date_time_ms;
         self::$execTiming[$startMarker]['  exec end in'] = $execEndMarker;
@@ -79,7 +79,7 @@ class execProfiler {
             self::$execTiming[$startMarker]['exec_started'],
             self::$execTiming[$startMarker]['exec_ended']
         );
-        self::$execTiming[$startMarker]['    exec time'] = $total;
+        self::$execTiming[$startMarker]['    exec time'] = sprintf("%01.16f", $total);
     }
 
     /**
@@ -121,6 +121,7 @@ class execProfiler {
      */
     public static function outputExecStat(
         $sortOutputBy = 0,
+        $longMarkersOnly = 0,
         $outputLabel = '',
         $output = 'print',
         $fullFilePath = FALSE
@@ -187,8 +188,18 @@ class execProfiler {
                     unset($copy);
                     ksort(self::$execTiming);
                 }
+                if ($longMarkersOnly > 0) {
+                    $copy = array();
+                    foreach (self::$execTiming as $key => $element) {
+                        if ((float)self::$execTiming[$key]['    exec time'] > (float)$longMarkersOnly) {
+                            $copy[$key] = $element;
+                        }
+                    }
+                    self::$execTiming = $copy;
+                    unset($copy);
+                }
                 print(
-                    "\n####### Bigining of execProfiler output:\n\n".
+                    "\n####### Bigining of execProfiler output $outputLabel:\n\n".
                     json_encode(
                         self::$execTiming,
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
