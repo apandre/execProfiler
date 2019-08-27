@@ -27,8 +27,9 @@ class execProfiler {
     /**
      * Method start execution timing for specified marker
      *
-     * @uses usage Following code example should be used to start profiling:
+     * @uses usage  Following code example should be used to start profiling:
      *                  $execMarker = execProfiler::startTimer("My Execution Marker");
+     *              Make sure that variable name for $execMarker is unique within same scope
      *
      * @param string $marker
      * @param int $bkTrace  If equal 1, then result of debug_backtrace() will be included
@@ -116,6 +117,7 @@ class execProfiler {
      *        0 - output order is by start time (default)
      *        1 - output order is by stop time
      *
+     * @param float $longMarkersOnly
      * @param type $output
      * @param type $fullFilePath
      */
