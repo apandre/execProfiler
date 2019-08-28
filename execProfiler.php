@@ -201,7 +201,7 @@ class execProfiler {
                     unset($copy);
                 }
                 print(
-                    "\n####### Bigining of execProfiler output $outputLabel:\n\n".
+                    "\n####### Begining of execProfiler output $outputLabel:\n\n".
                     json_encode(
                         self::$execTiming,
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
