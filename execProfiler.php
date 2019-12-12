@@ -3,7 +3,7 @@
  * @author Alex Pandre
  * @copyright (c) 2009-current, Alex Pandre
  * @license MIT
- * @version 1.00s
+ * @version 1.02s
  * @link https://github.com/apandre/execProfiler PHP Code Execution Profiler and variable watcher.
  * @uses    For executions and variable watching of your choosing.
  *          Its accumulate all information in property array,
@@ -41,9 +41,10 @@ class execProfiler {
     public static function startTimer( $marker, $bkTrace = 0 ) {
         $backtrace = debug_backtrace();
         $execStartMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
-        $microtime = microtime(TRUE);
-        $date = DateTime::createFromFormat('U.u', (string) $microtime);
-        $date_time_ms = $date->format('Y-m-d H:i:s.u');
+        $microtime = exec('date +%s.%N'); // microtime(TRUE);
+        //$date = DateTime::createFromFormat('U.u', $microtime += 0.001);
+        //$date_time_ms = $date->format('Y-m-d H:i:s.u');
+        $date_time_ms = exec("date -d @$microtime +'%F %T.%N'");
         if (empty($marker)) {
             $execMarker = $date_time_ms;   //self::getExecMarkerAsFileAndLineNum();
         } else {
@@ -69,9 +70,10 @@ class execProfiler {
     public static function stopTimer( $startMarker ) {
         $backtrace = debug_backtrace();
         $execEndMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
-        $microtime = microtime(TRUE);
-        $date = DateTime::createFromFormat('U.u', (string) $microtime);
-        $date_time_ms = $date->format('Y-m-d H:i:s.u');
+        $microtime = exec('date +%s.%N'); // microtime(TRUE);
+        //$date = DateTime::createFromFormat('U.u', $microtime += 0.001);
+        //$date_time_ms = $date->format('Y-m-d H:i:s.u');
+        $date_time_ms = exec("date -d @$microtime +'%F %T.%N'");
         self::$execTiming[$startMarker]['    stop time'] = $date_time_ms;
         self::$execTiming[$startMarker]['  exec end in'] = $execEndMarker;
         self::$execTiming[$startMarker]['exec_ended'] = $microtime;
@@ -201,11 +203,11 @@ class execProfiler {
                     unset($copy);
                 }
                 print(
-                    "\n####### Begining of execProfiler output $outputLabel:\n\n".
+                    "\n####### Begining of execProfiler output $outputLabel:\n".
                     json_encode(
                         self::$execTiming,
                         JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES
-                    )."\n".
+                    ).
                     "\n####### Ending of execProfiler output.\n"
                 );
                 break;
