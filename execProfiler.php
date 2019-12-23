@@ -113,7 +113,10 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         * @param any-type $var
         */
        public static function addVarToWatch( $mark, $varname, $var ) {
-           self::$execTiming[$mark][' watched vars'][$varname] = $var;
+            $backtrace = debug_backtrace();
+            $varName = sprintf("Line# %4d -- %s", $backtrace[0]['line'], $varname);
+            $varName = rtrim($varName, "- ");
+            self::$execTiming[$mark][' watched vars'][$varName] = $var;
        }
 
 
