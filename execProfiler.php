@@ -63,14 +63,14 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                 // slow
                 $mt = explode(' ', microtime());
                 $microtime = $mt[1] . '.' . $mt[0];
-                $date = DateTime::createFromFormat('U.u', $microtime += 0.001);
+                $date = DateTime::createFromFormat('U.u', $microtime += 0.000000001);
                 $date_time_ms = $date->format('Y-m-d H:i:s.u');
             }
 
             if (self::$fractionalTimeMethod == 'php_microtime_true') {
                 // fast
                 $microtime = microtime(TRUE);
-                $date = DateTime::createFromFormat('U.u', $microtime += 0.001);
+                $date = DateTime::createFromFormat('U.u', $microtime += 0.000000001);
                 $date_time_ms = $date->format('Y-m-d H:i:s.u');
             }
 
