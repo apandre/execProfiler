@@ -21,6 +21,10 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
      * class with empty methods
      */
     class execProfiler {
+        public static $execTiming = array();
+        public static $backTraceEnabled;
+        public static $fractionalTimeMethod;
+        public static $defaultLogLevel;
         public static function startTimer() {}
         public static function stopTimer() {}
         public static function addVarToWatch() {}
@@ -52,7 +56,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          *      'php_microtime' for microtime() way,
          *      'system_tsn' for exec('date +%s.%N') - timestamp with nanoseconds
          */
-        public static $fractionalTimeMethod;
+        public static $fractionalTimeMethod = 'php_microtime_true';
 
         /**
          * Default Logging Level
@@ -86,7 +90,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                     number_format($microtime, 6, '.', '')
                 )->setTimezone(
                     (new \DateTimeZone('America/New_York'))
-                )->format('Y-m-d H:i:s:u');
+                )->format('Y-m-d H:i:s.u');
             }
 
             if (self::$fractionalTimeMethod == 'system_tsn') {
@@ -355,6 +359,8 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          */
         public static function debugLog($param, $logLevel)
         {
+            global $execProfilerEnabled;
+
             if (!isset(self::$defaultLogLevel) || self::$defaultLogLevel === 0) {
                 return;
             }
@@ -364,7 +370,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             $backtrace = debug_backtrace();
             $file = $backtrace[0]['file'];
             $line = $backtrace[0]['line'];
-            if (!empty($this->execProfilerEnabled)) {
+            if (!empty($execProfilerEnabled)) {
                 printf("\n\n%s : Line# %4d:\n%s\n", $file, $line, $param);
             }
         }
