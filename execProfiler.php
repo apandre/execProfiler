@@ -3,7 +3,7 @@
  * @author Alex Pandre
  * @copyright (c) 2009-current, Alex Pandre
  * @license MIT
- * @version 1.04
+ * @version 1.05
  * @link https://github.com/apandre/execProfiler PHP Code Execution Profiler and variable watcher.
  * @uses    For executions and variable watching of your choosing.
  *          Its accumulate all information in property array,
@@ -25,6 +25,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         public static function stopTimer() {}
         public static function addVarToWatch() {}
         public static function outputExecStat() {}
+        public static function debugLog() {}
         public static function getExecMarkerAsFileAndLineNum() {}
         private static function is_file_line() {}
     }
@@ -53,6 +54,11 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          */
         public static $fractionalTimeMethod;
 
+        /**
+         * Default Logging Level
+         */
+        public static $defaultLogLevel;
+
 
         /**
          *
@@ -70,8 +76,17 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             if (self::$fractionalTimeMethod == 'php_microtime_true') {
                 // fast
                 $microtime = microtime(TRUE);
-                $date = DateTime::createFromFormat('U.u', $microtime += 0.000000001);
+                /*
+                // OO style doesn't works properly in PHP 7.0.x
+                $date = DateTime::createFromFormat('U.u', number_format($microtime, 6, '.', ''));
                 $date_time_ms = $date->format('Y-m-d H:i:s.u');
+                */
+                $date_time_ms = date_create_from_format(
+                    'U.u',
+                    number_format($microtime, 6, '.', '')
+                )->setTimezone(
+                    (new \DateTimeZone('America/New_York'))
+                )->format('Y-m-d H:i:s:u');
             }
 
             if (self::$fractionalTimeMethod == 'system_tsn') {
@@ -165,6 +180,12 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             $varName = rtrim($varName, "- ");
             self::$execTiming[$mark][' watched vars'][$varName] = $var;
         }
+
+
+        /**
+         * @todo Later try this:
+         *          use function outputExecStat as log;
+         */
 
 
         /**
@@ -318,6 +339,35 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             }
         }
 
+
+        /**
+         * Debug Logger
+         * This setting use to set logging level:
+         *      0 - Silent (silent)
+         *      1 - Emergency (emerg)
+         *      2 - Alerts (alert)
+         *      3 - Critical (crit)
+         *      4 - Errors (err)
+         *      5 - Warnings (warn)
+         *      6 - Notification (notice)
+         *      7 - Information (info)
+         *      8 - Debug (debug)
+         */
+        public static function debugLog($param, $logLevel)
+        {
+            if (!isset(self::$defaultLogLevel) || self::$defaultLogLevel === 0) {
+                return;
+            }
+            if (isset($logLevel) && $logLevel > self::$defaultLogLevel) {
+                return;
+            }
+            $backtrace = debug_backtrace();
+            $file = $backtrace[0]['file'];
+            $line = $backtrace[0]['line'];
+            if (!empty($this->execProfilerEnabled)) {
+                printf("\n\n%s : Line# %4d:\n%s\n", $file, $line, $param);
+            }
+        }
+
     }   // End of class execProfiler
 }
-
