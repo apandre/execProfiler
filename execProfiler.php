@@ -3,7 +3,7 @@
  * @author Alex Pandre
  * @copyright (c) 2009-current, Alex Pandre
  * @license MIT
- * @version 1.05
+ * @version 1.06
  * @link https://github.com/apandre/execProfiler PHP Code Execution Profiler and variable watcher.
  * @uses    For executions and variable watching of your choosing.
  *          Its accumulate all information in property array,
@@ -178,9 +178,14 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          * @param string $varname
          * @param any-type $var
          */
-        public static function addVarToWatch( $mark, $varname, $var ) {
+        public static function addVarToWatch( $mark, $varname, $var, $logLevel = 8) {
+            if (isset($logLevel) && $logLevel > self::$defaultLogLevel) {
+                return;
+            }
             $backtrace = debug_backtrace();
-            $varName = sprintf("Line# %4d -- %s", $backtrace[0]['line'], $varname);
+            $file = $backtrace[0]['file'];
+            $line = $backtrace[0]['line'];
+            $varName = sprintf("%s # %d -- %s", basename($file), $line, $varname);
             $varName = rtrim($varName, "- ");
             self::$execTiming[$mark][' watched vars'][$varName] = $var;
         }
@@ -356,8 +361,9 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          *      6 - Notification (notice)
          *      7 - Information (info)
          *      8 - Debug (debug)
+         *      9 - Debug + sql
          */
-        public static function debugLog($param, $logLevel)
+        public static function debugLog($param, $logLevel = 8)
         {
             global $execProfilerEnabled;
 
@@ -371,7 +377,20 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             $file = $backtrace[0]['file'];
             $line = $backtrace[0]['line'];
             if (!empty($execProfilerEnabled)) {
-                printf("\n\n%s : Line# %4d:\n%s\n", $file, $line, $param);
+                if (is_array($param)) {
+                    printf(
+                        "\n\n%s : Line# %4d:\n%s\n",
+                        $file,
+                        $line,
+                        json_encode(
+                            $param,
+                            JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES+JSON_UNESCAPED_UNICODE
+                        )
+                    );
+                } else {
+                    printf("\n\n%s : Line# %4d:\n%s\n", $file, $line, $param);
+                }
+
             }
         }
 
