@@ -1,5 +1,5 @@
 {
-    "name": "execprofiler/execprofiler",
+    "name": "apandre/execprofiler",
     "description": "PHP Code Execution Profiler and variable watcher",
     "type": "library",
     "keywords": [
@@ -13,7 +13,7 @@
         {
             "name": "Alex Pandre",
             "email": "apandre@gmail.com",
-            "role": "author"
+            "role": "Developer"
         }
     ],
     "support": {
@@ -26,13 +26,6 @@
         "optimize-autoloader": true,
         "sort-packages": true
     },
-    "suggest": {
-        "ext-soap": "*",
-        "ext-xdebug": "*"
-    },
-    "bin": [
-        "phpunit"
-    ],
     "autoload": {
         "files": [
             "execProfiler.php"
