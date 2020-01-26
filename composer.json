@@ -19,6 +19,7 @@
     "support": {
         "issues": "https://github.com/apandre/execProfiler/issues"
     },
+    "minimum-stability": "dev",
     "config": {
         "platform": {
             "php": "^5.5 || ^7.0"
