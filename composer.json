@@ -10,7 +10,7 @@
     "repositories": [
         {
             "type": "vcs",
-            "url": "https://github.com/apandre/execProfiler"
+            "url": "https://github.com/apandre/execProfiler.git"
         }
     ],
     "homepage": "https://github.com/apandre/execProfiler",
