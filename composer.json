@@ -7,6 +7,12 @@
         "timing",
         "watching"
     ],
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/apandre/execProfiler"
+        }
+    ],
     "homepage": "https://github.com/apandre/execProfiler",
     "license": "MIT",
     "authors": [
