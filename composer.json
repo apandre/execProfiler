@@ -1,0 +1,41 @@
+{
+    "name": "execprofiler/execprofiler",
+    "description": "PHP Code Execution Profiler and variable watcher",
+    "type": "library",
+    "keywords": [
+        "profiler",
+        "timing",
+        "watching"
+    ],
+    "homepage": "https://github.com/apandre/execProfiler",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alex Pandre",
+            "email": "apandre@gmail.com",
+            "role": "author"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/apandre/execProfiler/issues"
+    },
+    "config": {
+        "platform": {
+            "php": "7.0"
+        },
+        "optimize-autoloader": true,
+        "sort-packages": true
+    },
+    "suggest": {
+        "ext-soap": "*",
+        "ext-xdebug": "*"
+    },
+    "bin": [
+        "phpunit"
+    ],
+    "autoload": {
+        "files": [
+            "execProfiler.php"
+        ]
+    }
+}
