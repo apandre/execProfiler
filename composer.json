@@ -26,13 +26,9 @@
     "config": {
         "platform": {
             "php": "^5.5 || ^7.0"
-        },
-        "optimize-autoloader": true,
-        "sort-packages": true
+        }
     },
     "autoload": {
-        "files": [
-            "execProfiler.php"
-        ]
+        "psr-4": {"execProfiler\\": "/"}
     }
 }
