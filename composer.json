@@ -1,7 +1,7 @@
 {
     "name": "apandre/execprofiler",
     "description": "PHP Code Execution Profiler and variable watcher",
-    "type": "library",
+    "type": "package",
     "keywords": [
         "profiler",
         "timing",
@@ -9,7 +9,7 @@
     ],
     "repositories": [
         {
-            "type": "vcs",
+            "type": "git",
             "url": "https://github.com/apandre/execProfiler.git"
         }
     ],
