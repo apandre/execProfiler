@@ -3,7 +3,7 @@
  * @author Alex Pandre
  * @copyright (c) 2009-current, Alex Pandre
  * @license MIT
- * @version 1.06
+ * @version 1.07
  * @link https://github.com/apandre/execProfiler PHP Code Execution Profiler and variable watcher.
  * @uses    For executions and variable watching of your choosing.
  *          Its accumulate all information in property array,
@@ -32,6 +32,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         public static function debugLog() {}
         public static function getExecMarkerAsFileAndLineNum() {}
         private static function is_file_line() {}
+        public function pdo_debugStrParams() {}
     }
 } else {
     /**
@@ -362,8 +363,9 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          *      7 - Information (info)
          *      8 - Debug (debug)
          *      9 - Debug + sql
+         *      ...
          */
-        public static function debugLog($param, $logLevel = 8)
+        public static function debugLog($param, $logLevel = 8, $label = "")
         {
             global $execProfilerEnabled;
 
@@ -379,19 +381,36 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             if (!empty($execProfilerEnabled)) {
                 if (is_array($param)) {
                     printf(
-                        "\n\n%s : Line# %4d:\n%s\n",
+                        "\n\n%s : Line# %4d: %s\n%s\n",
                         $file,
                         $line,
+                        $label,
                         json_encode(
                             $param,
                             JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES+JSON_UNESCAPED_UNICODE
                         )
                     );
                 } else {
-                    printf("\n\n%s : Line# %4d:\n%s\n", $file, $line, $param);
+                    printf("\n%s : Line# %4d: %s\n%s\n", $file, $line, $label, $param);
                 }
 
             }
+        }
+
+
+        /**
+         * Method obtain output of PDO->debugDumpParams() as a string
+         */
+        public static function pdo_debugStrParams($stmt)
+        {
+            if (empty($stmt)) {
+                return false;
+            }
+            ob_start();
+            $stmt->debugDumpParams();
+            $r = ob_get_contents();
+            ob_end_clean();
+            return $r;
         }
 
     }   // End of class execProfiler
