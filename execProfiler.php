@@ -32,7 +32,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         public static function debugLog() {}
         public static function getExecMarkerAsFileAndLineNum() {}
         private static function is_file_line() {}
-        public function pdo_debugStrParams() {}
+        public static function pdo_debugStrParams() {}
     }
 } else {
     /**
@@ -401,7 +401,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         /**
          * Method obtain output of PDO->debugDumpParams() as a string
          */
-        public static function pdo_debugStrParams($stmt)
+        public static function pdo_debugStrParams(&$stmt)
         {
             if (empty($stmt)) {
                 return false;
