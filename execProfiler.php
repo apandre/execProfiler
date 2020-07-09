@@ -3,11 +3,11 @@
  * @author Alex Pandre
  * @copyright (c) 2009-current, Alex Pandre
  * @license MIT
- * @version 1.07
+ * @version 1.08
  * @link https://github.com/apandre/execProfiler PHP Code Execution Profiler and variable watcher.
  * @uses    For executions and variable watching of your choosing.
  *          Its accumulate all information in property array,
- *          and then you can output all of it into many different ways.
+ *          and then you can log output all of it into many different ways.
  * @package execProfiler
  */
 
@@ -21,10 +21,11 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
      * class with empty methods
      */
     class execProfiler {
+        public static $enable;
         public static $execTiming = array();
-        public static $backTraceEnabled;
+        public static $backTraceEnabled = 0;
         public static $fractionalTimeMethod;
-        public static $defaultLogLevel;
+        public static $defaultLogLevel = 0;
         public static function startTimer() {}
         public static function stopTimer() {}
         public static function addVarToWatch() {}
@@ -36,9 +37,12 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
     }
 } else {
     /**
-     *
+     * Execution Profiler class
      */
     class execProfiler {
+
+        public static $enable;
+
         /**
          * @var array $execTiming Property represent a container that accumulate all profiling information
          * and variable watching by storing it based on execution marker as a key.
@@ -47,9 +51,9 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         public static $execTiming = array();
 
         /**
-         *
+         * BackTrace enabling flag
          */
-        public static $backTraceEnabled;
+        public static $backTraceEnabled = 0;
 
         /**
          * This property define how we set fractional time.
@@ -62,11 +66,11 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         /**
          * Default Logging Level
          */
-        public static $defaultLogLevel;
+        public static $defaultLogLevel = 0;
 
 
         /**
-         *
+         * Obtain fractional time
          */
         public static function getFractionalTime()
         {
@@ -132,12 +136,14 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             } else {
                 $execMarker = $marker;
             }
-            self::$execTiming[$execMarker]['   start time'] = $mtObj->date_time_ms;
-            self::$execTiming[$execMarker]['exec start in'] = $execStartMarker;
-            self::$execTiming[$execMarker]['exec_started'] = $mtObj->microtime;
+            self::$execTiming[$execMarker]['start time'] = $mtObj->date_time_ms;
+            self::$execTiming[$execMarker]['  start in'] = $execStartMarker;
+            self::$execTiming[$execMarker]['started'] = $mtObj->microtime;
+            /*
             if ( self::$backTraceEnabled == 1 ) {
                 self::$execTiming[$execMarker]['backtrace'] = $backtrace;
             }
+            */
             return $execMarker;
         }
 
@@ -145,26 +151,36 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         /**
          * Method stop execution timing for specified marker
          *
-         * @uses usage Following code example should be used to stop profiling:
+         * @uses usage  Following code example should be used to stop profiling:
          *                  execProfiler::stopTimer($execMarker);
+         *              Where $execMarker is a string marker
+         *              defined during method execProfiler::startTimer() call.
          *
-         * @param string $startMarker
+         * @param string $marker
          */
-        public static function stopTimer( $startMarker ) {
+        public static function stopTimer( $marker, $varname = '', $var = null, $logLevel = 7 ) {
             $backtrace = debug_backtrace();
             $execEndMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
 
             $mtObj = self::getFractionalTime();
 
-            self::$execTiming[$startMarker]['    stop time'] = $mtObj->date_time_ms;
-            self::$execTiming[$startMarker]['  exec end in'] = $execEndMarker;
-            self::$execTiming[$startMarker]['exec_ended'] = $mtObj->microtime;
-            $total = self::$execTiming[$startMarker]['exec_ended'] - self::$execTiming[$startMarker]['exec_started'];
+            if (!empty($varname) && !empty($var)) {
+                self::addVarToWatch($marker, $varname, $var, $logLevel, $backtrace);
+            }
+
+            self::$execTiming[$marker][' stop time'] = $mtObj->date_time_ms;
+            self::$execTiming[$marker]['    end in'] = $execEndMarker;
+
+            self::$execTiming[$marker]['ended'] = $mtObj->microtime;
+            $total = self::$execTiming[$marker]['ended'] - self::$execTiming[$marker]['started'];
             unset(
-                self::$execTiming[$startMarker]['exec_started'],
-                self::$execTiming[$startMarker]['exec_ended']
+                self::$execTiming[$marker]['started'],
+                self::$execTiming[$marker]['ended']
             );
-            self::$execTiming[$startMarker]['    exec time'] = sprintf("%01.16f", $total);
+            self::$execTiming[$marker][' exec time'] = sprintf("%01.16f", $total);
+            if ( self::$backTraceEnabled == 1 ) {
+                self::$execTiming[$marker]['backtrace'] = $backtrace;
+            }
         }
 
 
@@ -177,18 +193,31 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          *
          * @param string $mark
          * @param string $varname
-         * @param any-type $var
+         * @param mix $var
          */
-        public static function addVarToWatch( $mark, $varname, $var, $logLevel = 8) {
+        public static function addVarToWatch(
+            $mark,
+            $varname,
+            $var,
+            $logLevel = 7,
+            $stopTimerBackTrace = null
+        )
+        {
             if (isset($logLevel) && $logLevel > self::$defaultLogLevel) {
                 return;
             }
-            $backtrace = debug_backtrace();
-            $file = $backtrace[0]['file'];
-            $line = $backtrace[0]['line'];
+
+            if (empty($stopTimerBackTrace)) {
+                $backtrace = debug_backtrace();
+                $file = $backtrace[0]['file'];
+                $line = $backtrace[0]['line'];
+            } else {
+                $file = $stopTimerBackTrace[0]['file'];
+                $line = $stopTimerBackTrace[0]['line'];
+            }
             $varName = sprintf("%s # %d -- %s", basename($file), $line, $varname);
             $varName = rtrim($varName, "- ");
-            self::$execTiming[$mark][' watched vars'][$varName] = $var;
+            self::$execTiming[$mark]['watching vars'][$varName] = $var;
         }
 
 
@@ -201,7 +230,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         /**
          * Method output information accumulated within self::$execTiming container
          *
-         * @uses usage  Following code example should be used to output profiling and watched variables data:
+         * @uses usage  Following code example should be used to output profiling and variables watching:
          *                  execProfiler::outputExecStat(1);
          *              Usually, it is last peace of code within test script,
          *              unless developer wish to start another profiling accumulation session.
@@ -273,7 +302,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                             ."\nExecution start point: ".$value['exec_start_marker']
                             ."\nExecution time:        %01.13f seconds."
                             ."\nExecution end point:   ".$value['exec_end_marker']."\n",
-                            $value['exec_time']
+                            $value[' exec_time']
                         );
                     }
                     break;
@@ -283,7 +312,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                     if ($sortOutputBy == 1) {
                         $copy = array();
                         foreach (self::$execTiming as $key => $element) {
-                            $copy[$element['    stop time'].' -- '.$key] = $element;
+                            $copy[$element[' stop time'].' -- '.$key] = $element;
                         }
                         self::$execTiming = $copy;
                         unset($copy);
@@ -292,7 +321,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                     if ($longMarkersOnly > 0) {
                         $copy = array();
                         foreach (self::$execTiming as $key => $element) {
-                            if ((float)self::$execTiming[$key]['    exec time'] > (float)$longMarkersOnly) {
+                            if ((float)self::$execTiming[$key][' exec time'] > (float)$longMarkersOnly) {
                                 $copy[$key] = $element;
                             }
                         }
@@ -305,7 +334,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                             self::$execTiming,
                             JSON_PRETTY_PRINT+JSON_UNESCAPED_SLASHES+JSON_UNESCAPED_UNICODE
                         )
-                        . "\n####### Ending of execProfiler output.\n"
+                        . "\n####### Ending of execProfiler output.\n\n"
                     );
                     break;
                 }
@@ -381,7 +410,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             if (!empty($execProfilerEnabled)) {
                 if (is_array($param)) {
                     printf(
-                        "\n\n%s : Line# %4d: %s\n%s\n",
+                        "\n\n%s : # %d: %s\n%s\n",
                         $file,
                         $line,
                         $label,
@@ -391,7 +420,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                         )
                     );
                 } else {
-                    printf("\n%s : Line# %4d: %s\n%s\n", $file, $line, $label, $param);
+                    printf("\n%s : # %d: %s\n%s\n", $file, $line, $label, $param);
                 }
 
             }
