@@ -3,7 +3,7 @@
  * @author Alex Pandre
  * @copyright (c) 2009-current, Alex Pandre
  * @license MIT
- * @version 1.08
+ * @version 1.09
  * @link https://github.com/apandre/execProfiler PHP Code Execution Profiler and variable watcher.
  * @uses    For executions and variable watching of your choosing.
  *          Its accumulate all information in property array,
@@ -32,6 +32,7 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
         public static function outputExecStat() {}
         public static function debugLog() {}
         public static function getExecMarkerAsFileAndLineNum() {}
+        public static function recursiveArrayFilterEmptyOut() {}
         private static function is_file_line() {}
         public static function pdo_debugStrParams() {}
     }
@@ -158,11 +159,22 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
          *
          * @param string $marker
          */
-        public static function stopTimer( $marker, $varname = '', $var = null, $logLevel = 7 ) {
+        public static function stopTimer( $marker, $varname = '', $var = null, $logLevel = 7 )
+        {
+            /**
+             * @todo    Introduce check on execProfiler::$defaultLogLevel
+             *          and modify $var based on $defaultLogLevel.
+             *          Do the same in addVarToWatch() method.
+             */
+
             $backtrace = debug_backtrace();
             $execEndMarker = $backtrace[0]['file'].' # '.$backtrace[0]['line'];
 
             $mtObj = self::getFractionalTime();
+
+            if (is_array($var)) {
+                $var = self::recursiveArrayFilterEmptyOut($var);
+            }
 
             if (!empty($varname) && !empty($var)) {
                 self::addVarToWatch($marker, $varname, $var, $logLevel, $backtrace);
@@ -424,6 +436,21 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
                 }
 
             }
+        }
+
+
+        /**
+         * Recursively remove all empty elements from multidimensional array.
+         * Including empty sub-arrays.
+         */
+        public static function recursiveArrayFilterEmptyOut($input)
+        {
+            foreach ($input as &$value){
+                if (is_array($value)){
+                    $value = self::recursiveArrayFilterEmptyOut($value);
+                }
+            }
+            return array_filter($input);
         }
 
 
