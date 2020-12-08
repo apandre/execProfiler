@@ -184,11 +184,17 @@ if (!isset($execProfilerEnabled) || empty($execProfilerEnabled)) {
             self::$execTiming[$marker]['    end in'] = $execEndMarker;
 
             self::$execTiming[$marker]['ended'] = $mtObj->microtime;
-            $total = self::$execTiming[$marker]['ended'] - self::$execTiming[$marker]['started'];
-            unset(
-                self::$execTiming[$marker]['started'],
-                self::$execTiming[$marker]['ended']
-            );
+            if (isset(self::$execTiming[$marker]['started']) && !empty(self::$execTiming[$marker]['started'])) {
+                $total = self::$execTiming[$marker]['ended'] - self::$execTiming[$marker]['started'];
+                unset(
+                    self::$execTiming[$marker]['started'],
+                    self::$execTiming[$marker]['ended']
+                );
+            } else {
+                self::$execTiming[$marker]['backtrace'] = $backtrace;
+                $total = 1;
+            }
+
             self::$execTiming[$marker][' exec time'] = sprintf("%01.16f", $total);
             if ( self::$backTraceEnabled == 1 ) {
                 self::$execTiming[$marker]['backtrace'] = $backtrace;
